@@ -3,7 +3,7 @@ A Simple Tool for changing the value of NTSystemTimer to achieve Less latency an
 
 ## How to Use
 
->[!INFO]
+>[!IMPORTANT]
 > This script requires Python version 3.6 or newer to work
 - Clone this repository:
 ~~~
