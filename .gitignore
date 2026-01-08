@@ -1,2 +1,5 @@
+# Compiled Bytecodes
 __pycache__/
+
+# Other stuff
 test.py

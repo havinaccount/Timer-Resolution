@@ -79,7 +79,7 @@ def new_window() -> None:
 
     warning_lbl: tk.Label = tk.Label(
         warning,
-        text="Please type your value in nanoseconds, For example: 0.5ms is 5000ns.\nAlso, Changing resolution may affect system stability.\nProceed with caution!",
+        text="Please type your value in 100ns units, For example: 0.5ms is 5000ns.\nAlso, Changing resolution may affect system stability.\nProceed with caution!",
     )
     warning_lbl.pack(pady=10)
 
@@ -88,6 +88,7 @@ def new_window() -> None:
         new.deiconify()  # Show custom resolution after the window is closed
         new.attributes("-topmost", True)
         new.focus_force()
+        new.grab_set()
 
     confirm_btn: ttk.Button = ttk.Button(warning, text="Ok", command=close_warning)
     confirm_btn.pack(pady=10)
@@ -106,7 +107,7 @@ def new_window() -> None:
     entry: ttk.Entry = ttk.Entry(master=new, width=28)
     entry.pack()
 
-    def clicked(event=None) -> None:
+    def clicked(event: object=None) -> None:
         res: str = str(entry.get())
         if not res:
             return
