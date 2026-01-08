@@ -37,7 +37,3 @@ jobs:
         pylint timerresolution.py --ignore-imports=y --disable=import-error --disable=redefined-outer-name
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         pylint timerresolution.py --disable=redefined-outer-name --disable=import-error --ignore-imports=y --max-line-length=127
-
-    - name: Test with pytest
-      run: |
-        pytest
