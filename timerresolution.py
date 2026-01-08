@@ -1,5 +1,5 @@
 """
-A Simple Tool for changing the value of NTSystemTimer 
+A Simple Tool for changing the value of NTSystemTimer
 to achieve Less latency and optimized polling rate
 """
 
@@ -19,7 +19,7 @@ default_res: int = current
 def format_ms(value: int) -> str:
     """
     Format any value to milliseconds because of the Windows API convention
-    that reports in 100ns (nanoseconds): 
+    that reports in 100ns (nanoseconds):
     http://undocumented.ntinternals.net/index.html?page=UserMode2FUndocumented20Functions2FTime2FNtQueryTimerResolution.html
     """
     return f"{value/10000:.3f} ms"
@@ -61,21 +61,99 @@ def exit_out() -> None:
     root.destroy()
 
 
+def new_window() -> None:
+    """
+    Make a window for setting custom resolutions
+    """
+    new: tk.Toplevel = tk.Toplevel(root)
+    new.title("Custom Resolution")
+    center_window(new, 200, 110)
+    new.resizable(width=False, height=False)
+    new.withdraw()  # Hide until warning is acknowledged
+
+    # Create the warning window
+    warning: tk.Toplevel = tk.Toplevel(root)
+    warning.title("Warning")
+    center_window(warning, 375, 125)
+    warning.resizable(width=False, height=False)
+
+    warning_lbl: tk.Label = tk.Label(
+        warning,
+        text="Please type your value in nanoseconds, For example: 0.5ms is 5000ns.\nAlso, Changing resolution may affect system stability.\nProceed with caution!",
+    )
+    warning_lbl.pack(pady=10)
+
+    def close_warning() -> None:
+        warning.destroy()
+        new.deiconify()  # Show custom resolution after the window is closed
+        new.attributes("-topmost", True)
+        new.focus_force()
+
+    confirm_btn: ttk.Button = ttk.Button(warning, text="Ok", command=close_warning)
+    confirm_btn.pack(pady=10)
+
+    # Block interaction with other windows until warning is closed
+    warning.attributes("-topmost", True)
+    warning.grab_set()
+    root.wait_window(warning)
+
+    # --- Custom Resolution UI ---
+    new_lbl: tk.Label = tk.Label(
+        master=new, text=f"Current Resolution: {format_ms(current)}"
+    )
+    new_lbl.pack(pady=10)
+
+    entry: ttk.Entry = ttk.Entry(master=new, width=28)
+    entry.pack()
+
+    def clicked(event=None) -> None:
+        res: str = str(entry.get())
+        if not res:
+            return
+        try:
+            with wres.set_resolution(int(res)):
+                _, _, current = wres.query_resolution()
+                new_lbl.config(text=f"Current Resolution: {format_ms(current)}")
+                lbl.config(text=f"Current Resolution: {format_ms(current)}")
+        except ValueError:
+            new_lbl.config(text="Only numeric values are allowed.")
+            raise
+
+    new_btn: ttk.Button = ttk.Button(new, text="Apply", command=clicked)
+    new_btn.pack(pady=10)
+
+    new.bind("<Return>", clicked)
+
+
+def center_window(window: tk.Tk | tk.Toplevel, width: int, height: int) -> None:
+    """
+    Centers any window given using basic math
+    """
+    screen_width: int = window.winfo_screenwidth()
+    screen_height: int = window.winfo_screenheight()
+    x: int = (screen_width // 2) - (width // 2)
+    y: int = (screen_height // 2) - (height // 2)
+    window.geometry(f"{width}x{height}+{x}+{y}")
+
+
 # Configuration for the app
-root.geometry("300x110")
+WINDOW_WIDTH: int = 400
+WINDOW_HEIGHT: int = 110
+
+center_window(root, WINDOW_WIDTH, WINDOW_HEIGHT)
 root.resizable(width=False, height=False)
 root.title("Timer Resolution")
 
 lbl: tk.Label = tk.Label(text=f"Current Resolution: {format_ms(current)}")
 lbl.pack()
 
-lbl2 = tk.Label(text=f"Maximum Resolution: {format_ms(minres)}")
+lbl2: tk.Label = tk.Label(text=f"Maximum Resolution: {format_ms(minres)}")
 lbl2.pack()
 
-lbl3 = tk.Label(text=f"Maximum Resolution: {format_ms(maxres)}")
+lbl3: tk.Label = tk.Label(text=f"Maximum Resolution: {format_ms(maxres)}")
 lbl3.pack()
 
-btn_frame = tk.Frame(root)
+btn_frame: tk.Frame = tk.Frame(root)
 btn_frame.pack(pady=10)
 
 btn: ttk.Button = ttk.Button(btn_frame, text="Maximum", command=max_timer)
@@ -84,8 +162,11 @@ btn.pack(side="left", padx=10)
 btn2: ttk.Button = ttk.Button(btn_frame, text="Default", command=default_timer)
 btn2.pack(side="left", padx=10)
 
-btn3: ttk.Button = ttk.Button(btn_frame, text="Exit", command=exit_out)
+btn3: ttk.Button = ttk.Button(btn_frame, text="Custom", command=new_window)
 btn3.pack(side="left", padx=10)
+
+btn4: ttk.Button = ttk.Button(btn_frame, text="Exit", command=exit_out)
+btn4.pack(side="left", padx=10)
 
 # Trigger 'on_exit()' when window is closed
 root.protocol("WM_DELETE_WINDOW", on_exit)
