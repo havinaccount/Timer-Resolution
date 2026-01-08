@@ -69,10 +69,10 @@ root.title("Timer Resolution")
 lbl: tk.Label = tk.Label(text=f"Current Resolution: {format_ms(current)}")
 lbl.pack()
 
-lbl2 = tk.Label(text=f"Maximum Resolution: {minres}")
+lbl2 = tk.Label(text=f"Maximum Resolution: {format_ms(minres)}")
 lbl2.pack()
 
-lbl3 = tk.Label(text=f"Maximum Resolution: {maxres}")
+lbl3 = tk.Label(text=f"Maximum Resolution: {format_ms(maxres)}")
 lbl3.pack()
 
 btn_frame = tk.Frame(root)
