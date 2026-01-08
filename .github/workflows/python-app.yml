@@ -1,5 +1,5 @@
 # GitHub Actions workflow for Python on Windows
-# Installs dependencies, runs linting, and executes tests
+# Installs dependencies and runs linting
 
 name: Python application
 
