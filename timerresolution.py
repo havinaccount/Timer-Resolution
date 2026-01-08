@@ -1,3 +1,8 @@
+"""
+A Simple Tool for changing the value of NTSystemTimer 
+to achieve Less latency and optimized polling rate
+"""
+
 import tkinter as tk
 from tkinter import ttk
 
@@ -11,37 +16,48 @@ maxres, minres, current = wres.query_resolution()
 default_res: int = current
 
 
-# Format it to milliseconds because of the Windows API convention
-# that reports in ns (nanoseconds) http://undocumented.ntinternals.net/index.html?page=UserMode2FUndocumented20Functions2FTime2FNtQueryTimerResolution.html
 def format_ms(value: int) -> str:
+    """
+    Format any value to milliseconds because of the Windows API convention
+    that reports in 100ns (nanoseconds): 
+    http://undocumented.ntinternals.net/index.html?page=UserMode2FUndocumented20Functions2FTime2FNtQueryTimerResolution.html
+    """
     return f"{value/10000:.3f} ms"
 
 
-# Sets the value to it's max
 def max_timer() -> int:
+    """
+    Sets the value NTSystemTimer to it's max using NtSetSystemTime
+    """
     with wres.set_resolution(5000):
         _, _, current = wres.query_resolution()
         lbl.config(text=f"Current Resolution: {format_ms(current)}")
         return current
 
 
-# Set it back to the default value
 def default_timer() -> int:
+    """
+    Sets NTSystemTimer value back to the default using NtSetSystemTime
+    """
     with wres.set_resolution(162500):
         _, _, current = wres.query_resolution()
         lbl.config(text=f"Current Resolution: {format_ms(current)}")
         return current
 
 
-# Reset the timer on exit
 def on_exit() -> None:
+    """
+    Reset the NTSystemTimer on exit using NtSetSystemTime
+    """
     with wres.set_resolution(default_res):
         pass
     root.destroy()
 
 
-# Exit the app
 def exit_out() -> None:
+    """
+    Exit the app
+    """
     root.destroy()
 
 
