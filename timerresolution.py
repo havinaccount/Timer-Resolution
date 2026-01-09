@@ -5,6 +5,7 @@ to achieve Less latency and optimized polling rate
 
 import tkinter as tk
 from tkinter import ttk
+from typing import Union
 
 import wres
 
@@ -61,15 +62,15 @@ def exit_out() -> None:
     root.destroy()
 
 
-def new_window() -> None:
+def custom_res_window() -> None:
     """
     Make a window for setting custom resolutions
     """
-    new: tk.Toplevel = tk.Toplevel(root)
-    new.title("Custom Resolution")
-    center_window(new, 200, 110)
-    new.resizable(width=False, height=False)
-    new.withdraw()  # Hide until warning is acknowledged
+    custom_res: tk.Toplevel = tk.Toplevel(root)
+    custom_res.title("Custom Resolution")
+    center_window(custom_res, 200, 110)
+    custom_res.resizable(width=False, height=False)
+    custom_res.withdraw()  # Hide until warning is acknowledged
 
     # Create the warning window
     warning: tk.Toplevel = tk.Toplevel(root)
@@ -83,12 +84,13 @@ def new_window() -> None:
     )
     warning_lbl.pack(pady=10)
 
+    # Function for opening custom
     def close_warning() -> None:
         warning.destroy()
-        new.deiconify()  # Show custom resolution after the window is closed
-        new.attributes("-topmost", True)
-        new.focus_force()
-        new.grab_set()
+        custom_res.deiconify()  # Show custom resolution after the window is closed
+        custom_res.attributes("-topmost", True)
+        custom_res.focus_force()
+        custom_res.grab_set()
 
     confirm_btn: ttk.Button = ttk.Button(warning, text="Ok", command=close_warning)
     confirm_btn.pack(pady=10)
@@ -99,12 +101,12 @@ def new_window() -> None:
     root.wait_window(warning)
 
     # --- Custom Resolution UI ---
-    new_lbl: tk.Label = tk.Label(
-        master=new, text=f"Current Resolution: {format_ms(current)}"
+    custom_res_lbl: tk.Label = tk.Label(
+        master=custom_res, text=f"Current Resolution: {format_ms(current)}"
     )
-    new_lbl.pack(pady=10)
+    custom_res_lbl.pack(pady=10)
 
-    entry: ttk.Entry = ttk.Entry(master=new, width=28)
+    entry: ttk.Entry = ttk.Entry(master=custom_res, width=28)
     entry.pack()
 
     def clicked(event: object=None) -> None:
@@ -114,19 +116,19 @@ def new_window() -> None:
         try:
             with wres.set_resolution(int(res)):
                 _, _, current = wres.query_resolution()
-                new_lbl.config(text=f"Current Resolution: {format_ms(current)}")
+                custom_res_lbl.config(text=f"Current Resolution: {format_ms(current)}")
                 lbl.config(text=f"Current Resolution: {format_ms(current)}")
         except ValueError:
-            new_lbl.config(text="Only numeric values are allowed.")
+            custom_res_lbl.config(text="Only numeric values are allowed.")
             raise
 
-    new_btn: ttk.Button = ttk.Button(new, text="Apply", command=clicked)
-    new_btn.pack(pady=10)
+    custom_res_btn: ttk.Button = ttk.Button(custom_res, text="Apply", command=clicked)
+    custom_res_btn.pack(pady=10)
 
-    new.bind("<Return>", clicked)
+    custom_res.bind("<Return>", clicked)
 
 
-def center_window(window: tk.Tk | tk.Toplevel, width: int, height: int) -> None:
+def center_window(window: Union[tk.Tk, tk.Toplevel], width: int, height: int) -> None:
     """
     Centers any window given using basic math
     """
@@ -163,7 +165,7 @@ btn.pack(side="left", padx=10)
 btn2: ttk.Button = ttk.Button(btn_frame, text="Default", command=default_timer)
 btn2.pack(side="left", padx=10)
 
-btn3: ttk.Button = ttk.Button(btn_frame, text="Custom", command=new_window)
+btn3: ttk.Button = ttk.Button(btn_frame, text="Custom", command=custom_res_window)
 btn3.pack(side="left", padx=10)
 
 btn4: ttk.Button = ttk.Button(btn_frame, text="Exit", command=exit_out)
