@@ -4,20 +4,23 @@ to achieve Less latency and optimized polling rate
 """
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk # For native widgets
 from typing import Union
 
 import wres
 
+__version__ = "1.0.0"
+__author__ = "havinaccount"
+
 # Initialize a window
-root: tk.Tk = tk.Tk()
+root = tk.Tk()
 
 # Save the current timer
 maxres, minres, current = wres.query_resolution()
-default_res: int = current
+default_res = current
 
 
-def format_ms(value: int) -> str:
+def format_ms(value):
     """
     Format any value to milliseconds because of the Windows API convention
     that reports in 100ns (nanoseconds):
@@ -26,27 +29,29 @@ def format_ms(value: int) -> str:
     return f"{value/10000:.3f} ms"
 
 
-def max_timer() -> int:
+def max_timer():
     """
     Sets the value NTSystemTimer to it's max using NtSetSystemTime
     """
     with wres.set_resolution(5000):
         _, _, current = wres.query_resolution()
+        current: int
         lbl.config(text=f"Current Resolution: {format_ms(current)}")
         return current
 
 
-def default_timer() -> int:
+def default_timer():
     """
     Sets NTSystemTimer value back to the default using NtSetSystemTime
     """
     with wres.set_resolution(162500):
         _, _, current = wres.query_resolution()
+        current: int
         lbl.config(text=f"Current Resolution: {format_ms(current)}")
         return current
 
 
-def on_exit() -> None:
+def on_exit():
     """
     Reset the NTSystemTimer on exit using NtSetSystemTime
     """
@@ -55,14 +60,14 @@ def on_exit() -> None:
     root.destroy()
 
 
-def exit_out() -> None:
+def exit_out(event=None):
     """
     Exit the app
     """
     root.destroy()
 
 
-def custom_res_window() -> None:
+def custom_res_window():
     """
     Make a window for setting custom resolutions
     """
@@ -85,7 +90,7 @@ def custom_res_window() -> None:
     warning_lbl.pack(pady=10)
 
     # Function for opening custom
-    def close_warning() -> None:
+    def close_warning():
         warning.destroy()
         custom_res.deiconify()  # Show custom resolution after the window is closed
         custom_res.attributes("-topmost", True)
@@ -109,13 +114,14 @@ def custom_res_window() -> None:
     entry: ttk.Entry = ttk.Entry(master=custom_res, width=28)
     entry.pack()
 
-    def clicked(event: object=None) -> None:
+    def clicked(event=None):
         res: str = str(entry.get())
         if not res:
             return
         try:
             with wres.set_resolution(int(res)):
                 _, _, current = wres.query_resolution()
+                current: int
                 custom_res_lbl.config(text=f"Current Resolution: {format_ms(current)}")
                 lbl.config(text=f"Current Resolution: {format_ms(current)}")
         except ValueError:
@@ -128,7 +134,7 @@ def custom_res_window() -> None:
     custom_res.bind("<Return>", clicked)
 
 
-def center_window(window: Union[tk.Tk, tk.Toplevel], width: int, height: int) -> None:
+def center_window(window, width, height):
     """
     Centers any window given using basic math
     """
@@ -140,39 +146,42 @@ def center_window(window: Union[tk.Tk, tk.Toplevel], width: int, height: int) ->
 
 
 # Configuration for the app
-WINDOW_WIDTH: int = 400
-WINDOW_HEIGHT: int = 110
+WINDOW_WIDTH = 400
+WINDOW_HEIGHT = 110
 
 center_window(root, WINDOW_WIDTH, WINDOW_HEIGHT)
 root.resizable(width=False, height=False)
 root.title("Timer Resolution")
 
-lbl: tk.Label = tk.Label(text=f"Current Resolution: {format_ms(current)}")
+lbl = tk.Label(text=f"Current Resolution: {format_ms(current)}")
 lbl.pack()
 
-lbl2: tk.Label = tk.Label(text=f"Maximum Resolution: {format_ms(minres)}")
+lbl2 = tk.Label(text=f"Maximum Resolution: {format_ms(minres)}")
 lbl2.pack()
 
-lbl3: tk.Label = tk.Label(text=f"Maximum Resolution: {format_ms(maxres)}")
+lbl3 = tk.Label(text=f"Maximum Resolution: {format_ms(maxres)}")
 lbl3.pack()
 
-btn_frame: tk.Frame = tk.Frame(root)
+btn_frame = tk.Frame(root)
 btn_frame.pack(pady=10)
 
-btn: ttk.Button = ttk.Button(btn_frame, text="Maximum", command=max_timer)
+btn = ttk.Button(btn_frame, text="Maximum", command=max_timer)
 btn.pack(side="left", padx=10)
 
-btn2: ttk.Button = ttk.Button(btn_frame, text="Default", command=default_timer)
+btn2 = ttk.Button(btn_frame, text="Default", command=default_timer)
 btn2.pack(side="left", padx=10)
 
-btn3: ttk.Button = ttk.Button(btn_frame, text="Custom", command=custom_res_window)
+btn3 = ttk.Button(btn_frame, text="Custom", command=custom_res_window)
 btn3.pack(side="left", padx=10)
 
-btn4: ttk.Button = ttk.Button(btn_frame, text="Exit", command=exit_out)
+btn4 = ttk.Button(btn_frame, text="Exit", command=exit_out)
 btn4.pack(side="left", padx=10)
 
 # Trigger 'on_exit()' when window is closed
 root.protocol("WM_DELETE_WINDOW", on_exit)
+
+# Use a keybind for exiting the app
+root.bind("<Escape>", exit_out)
 
 # Run the app
 if __name__ == "__main__":
