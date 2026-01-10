@@ -1,0 +1,8 @@
+2026-01-10 18:15:15 - INFO - <module> - Line 224 - App initialized
+2026-01-10 18:15:26 - INFO - <module> - Line 224 - App initialized
+2026-01-10 18:15:55 - INFO - <module> - Line 226 - App initialized
+2026-01-10 18:15:59 - INFO - custom_res_window - Line 103 - Custom Resolution Window created
+2026-01-10 18:16:00 - INFO - set_resolution - Line 62 - Set resolution to 156250 * 100-ns
+2026-01-10 18:16:00 - INFO - on_exit - Line 78 - App killed
+2026-01-10 18:16:00 - INFO - set_resolution - Line 71 - Reset previously setted resolution
+2026-01-10 18:16:00 - ERROR - custom_res_window - Line 141 - Exited before window creation: can't invoke "label" command: application has been destroyed

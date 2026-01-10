@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Union
+from typing import Union, Final
 
 __version__: str
-author: str
+__author__: str
 
 root: tk.Tk
 
@@ -21,24 +21,24 @@ def max_timer() -> int:
 def default_timer() -> int:
     ...
 
-def on_exit() -> None:
+def on_exit(event: object = None) -> None:
     ...
 
-def exit_out() -> None:
+def exit_out(event: object = None) -> None:
     ...
 
 def custom_res_window() -> None:
     def close_warning() -> None:
         ...
     
-    def clicked(event=None) -> None:
+    def clicked(event: object = None) -> None:
         ...
 
 def center_window(window: Union[tk.Tk, tk.Toplevel], width: int, height: int) -> None:
     ...
 
-WINDOW_WIDTH: int
-WINDOW_HEIGHT: int
+WINDOW_WIDTH: Final[int]
+WINDOW_HEIGHT: Final[int]
 
 lbl: tk.Label
 lbl2: tk.Label

@@ -3,14 +3,27 @@ A Simple Tool for changing the value of NTSystemTimer
 to achieve Less latency and optimized polling rate
 """
 
+import logging
+import sys
 import tkinter as tk
-from tkinter import ttk # For native widgets
-from typing import Union
+from tkinter import ttk  # For native widgets
+from compileall import compile_dir
+import os
 
 import wres
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "havinaccount"
+
+logging.basicConfig(
+    filename="runtime.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(funcName)s - Line %(lineno)d - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
+compile_dir(".", optimize=2)
+os.system('cls')
 
 # Initialize a window
 root = tk.Tk()
@@ -34,6 +47,7 @@ def max_timer():
     Sets the value NTSystemTimer to it's max using NtSetSystemTime
     """
     with wres.set_resolution(5000):
+        logging.info("Changed NTSystemTimer value to 0.5ms")
         _, _, current = wres.query_resolution()
         current: int
         lbl.config(text=f"Current Resolution: {format_ms(current)}")
@@ -45,17 +59,23 @@ def default_timer():
     Sets NTSystemTimer value back to the default using NtSetSystemTime
     """
     with wres.set_resolution(162500):
+        logging.info("Changed NTSystemTimer value to 16.25ms")
         _, _, current = wres.query_resolution()
         current: int
         lbl.config(text=f"Current Resolution: {format_ms(current)}")
         return current
 
 
-def on_exit():
+def on_exit(event=None):
     """
     Reset the NTSystemTimer on exit using NtSetSystemTime
+    
+    Arguments:
+    
+    event: Used for keybinds working
     """
     with wres.set_resolution(default_res):
+        logging.info("App killed")
         pass
     root.destroy()
 
@@ -76,13 +96,18 @@ def custom_res_window():
     center_window(custom_res, 200, 110)
     custom_res.resizable(width=False, height=False)
     custom_res.withdraw()  # Hide until warning is acknowledged
-
+    custom_res.bind("<Escape>", exit_out)
+    
+    MESSAGE: str = "Custom Resolution Window created"
+    
+    logging.info(MESSAGE)
+    
     # Create the warning window
     warning: tk.Toplevel = tk.Toplevel(root)
     warning.title("Warning")
     center_window(warning, 375, 125)
     warning.resizable(width=False, height=False)
-
+    
     warning_lbl: tk.Label = tk.Label(
         warning,
         text="Please type your value in 100ns units, For example: 0.5ms is 5000ns.\nAlso, Changing resolution may affect system stability.\nProceed with caution!",
@@ -97,6 +122,8 @@ def custom_res_window():
         custom_res.focus_force()
         custom_res.grab_set()
 
+    warning.protocol("WM_DELETE_WINDOW", close_warning)
+
     confirm_btn: ttk.Button = ttk.Button(warning, text="Ok", command=close_warning)
     confirm_btn.pack(pady=10)
 
@@ -106,37 +133,48 @@ def custom_res_window():
     root.wait_window(warning)
 
     # --- Custom Resolution UI ---
-    custom_res_lbl: tk.Label = tk.Label(
+    try:
+        custom_res_lbl: tk.Label = tk.Label(
         master=custom_res, text=f"Current Resolution: {format_ms(current)}"
     )
+    except tk.TclError as e:
+        logging.error("Exited before window creation: %s", e)
+        sys.exit(0)
+        
     custom_res_lbl.pack(pady=10)
 
     entry: ttk.Entry = ttk.Entry(master=custom_res, width=28)
     entry.pack()
 
-    def clicked(event=None):
+    def set_custom(event=None):
         res: str = str(entry.get())
         if not res:
             return
         try:
             with wres.set_resolution(int(res)):
+                logging.info("Changed NTSystemTimer value to %sms", format_ms(int(res)))
                 _, _, current = wres.query_resolution()
                 current: int
                 custom_res_lbl.config(text=f"Current Resolution: {format_ms(current)}")
                 lbl.config(text=f"Current Resolution: {format_ms(current)}")
-        except ValueError:
+        except ValueError as e:
+            logging.error("Used an unknown data type, Probably a str: %s", e)
             custom_res_lbl.config(text="Only numeric values are allowed.")
             raise
 
-    custom_res_btn: ttk.Button = ttk.Button(custom_res, text="Apply", command=clicked)
+    custom_res_btn: ttk.Button = ttk.Button(custom_res, text="Apply", command=set_custom)
     custom_res_btn.pack(pady=10)
 
-    custom_res.bind("<Return>", clicked)
+    custom_res.bind("<Return>", set_custom)
 
 
-def center_window(window, width, height):
+def center_window(window: tk.Tk | tk.Toplevel, width, height):
     """
     Centers any window given using basic math
+    Arguments:
+    window: A window to center it's position to screen
+    width: The width of the window
+    height: The height of the window
     """
     screen_width: int = window.winfo_screenwidth()
     screen_height: int = window.winfo_screenheight()
@@ -181,8 +219,9 @@ btn4.pack(side="left", padx=10)
 root.protocol("WM_DELETE_WINDOW", on_exit)
 
 # Use a keybind for exiting the app
-root.bind("<Escape>", exit_out)
+root.bind("<Escape>", on_exit)
 
 # Run the app
 if __name__ == "__main__":
+    logging.info("App initialized")
     root.mainloop()
