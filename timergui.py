@@ -5,10 +5,11 @@ using Tkinter
 
 # ` It is recommended to use the Better Comments extension
 # ` while viewing this code in Visual Studio Code
-# Any "``" symbol refers to bold format
+# Any "`" symbol refers to bold format
 
+import os
 import logging
-import sys  # Use the sys module when needed
+import sys  # Usage at line 154
 import tkinter as tk
 from compileall import compile_dir
 from tkinter import ttk  # For native widgets
@@ -16,7 +17,7 @@ from typing import Final, Literal, Union
 
 import wres
 
-__version__: Literal["1.1.0"] = "1.1.0"
+__version__: Literal["1.1.1"] = "1.1.1"
 __author__: Literal["havinaccount"] = "havinaccount"
 
 logging.basicConfig(
@@ -30,6 +31,10 @@ logging.basicConfig(
 compile_dir(dir=".", optimize=2, quiet=1)
 # ` This is basically covering linux even though NtSystemTimer is a Windows API
 # // os.system('clear' if os.name == 'posix' else 'cls')
+
+if os.name is "posix":
+    print("This app is only functional for Windows.")
+    sys.exit(1) 
 
 # Initialize a window
 root: tk.Tk = tk.Tk()
@@ -61,7 +66,7 @@ def max_timer(event: object = None) -> int:
         logging.info("Changed NTSystemTimer value to 0.5ms")
         _, _, current = wres.query_resolution()
         current: int
-        lbl.config(text=f"Current Resolution: {format_ms(current)}")
+        lbl.configure(text=f"Current Resolution: {format_ms(current)}")
         return current
 
 
@@ -73,7 +78,7 @@ def default_timer(event: object = None) -> int:
         logging.info("Changed NTSystemTimer value to 16.25ms")
         _, _, current = wres.query_resolution()
         current: int
-        lbl.config(text=f"Current Resolution: {format_ms(current)}")
+        lbl.configure(text=f"Current Resolution: {format_ms(current)}")
         return current
 
 
@@ -102,10 +107,10 @@ def custom_res_window(event: object = None) -> None:
     Make a window for setting custom resolutions
     """
     custom_res: tk.Toplevel = tk.Toplevel(root)
-    custom_res.title("Custom Resolution")
+    custom_res.wm_title("Custom Resolution")
     center_window(custom_res, 200, 110)
-    custom_res.resizable(width=False, height=False)
-    custom_res.withdraw()  # Hide until warning is acknowledged
+    custom_res.wm_resizable(width=False, height=False)
+    custom_res.wm_withdraw()  # Hide until warning is acknowledged
     custom_res.bind("<Escape>", exit_out)
 
     logging.info("Custom Resolution Window created")
@@ -114,7 +119,7 @@ def custom_res_window(event: object = None) -> None:
     warning: tk.Toplevel = tk.Toplevel(root)
     warning.title("Warning")
     center_window(warning, 375, 125)
-    warning.resizable(width=False, height=False)
+    warning.wm_resizable(width=False, height=False)
     warning.focus_force()
 
     warning_lbl: tk.Label = tk.Label(
@@ -123,23 +128,23 @@ def custom_res_window(event: object = None) -> None:
         Also, Changing resolution may affect system stability.
         Proceed with caution!""",
     )
-    warning_lbl.pack(pady=10)
+    warning_lbl.pack_configure(pady=10)
 
     # Function for opening custom
     def close_warning() -> None:
         warning.destroy()
-        custom_res.deiconify()  # Show custom resolution after the window is closed
-        custom_res.attributes("-topmost", True)
+        custom_res.wm_deiconify()  # Show custom resolution after the window is closed
+        custom_res.wm_attributes("-topmost", True)
         custom_res.focus_force()
         custom_res.grab_set()
 
-    warning.protocol("WM_DELETE_WINDOW", close_warning)
+    warning.wm_protocol("WM_DELETE_WINDOW", close_warning)
 
     confirm_btn: ttk.Button = ttk.Button(warning, text="Ok", command=close_warning)
-    confirm_btn.pack(pady=10)
+    confirm_btn.pack_configure(pady=10)
 
     # Block interaction with other windows until warning is closed
-    warning.attributes("-topmost", True)
+    warning.wm_attributes("-topmost", True)
     warning.grab_set()
     root.wait_window(warning)
 
@@ -153,17 +158,17 @@ def custom_res_window(event: object = None) -> None:
         logging.error("Exited before window creation: %s", e)
         sys.exit(0)
 
-    custom_res_lbl.pack(pady=10)
+    custom_res_lbl.pack_configure(pady=10)
 
     entry: ttk.Entry = ttk.Entry(master=custom_res, width=28)
-    entry.pack()
+    entry.pack_configure()
 
     def set_custom(event: object = None) -> None:
         try:
             res: int = int(entry.get())
         except ValueError as e:
             logging.error("Used an unknown data type, Probably a str: %s", e)
-            custom_res_lbl.config(text="Only numeric values are allowed.")
+            custom_res_lbl.configure(text="Only numeric values are allowed.")
             raise
         if not res:
             return
@@ -171,13 +176,13 @@ def custom_res_window(event: object = None) -> None:
             logging.info("Changed NTSystemTimer value to %sms", format_ms(res))
             _, _, current = wres.query_resolution()
             current: int
-            custom_res_lbl.config(text=f"Current Resolution: {format_ms(current)}")
-            lbl.config(text=f"Current Resolution: {format_ms(current)}")
+            custom_res_lbl.configure(text=f"Current Resolution: {format_ms(current)}")
+            lbl.configure(text=f"Current Resolution: {format_ms(current)}")
 
     custom_res_btn: ttk.Button = ttk.Button(
         custom_res, text="Apply", command=set_custom
     )
-    custom_res_btn.pack(pady=10)
+    custom_res_btn.pack_configure(pady=10)
 
     custom_res.bind("<Return>", set_custom)
 
@@ -196,7 +201,7 @@ def center_window(  # type: ignore
     screen_height: int = window.winfo_screenheight()
     x: int = (screen_width // 2) - (width // 2)
     y: int = (screen_height // 2) - (height // 2)
-    window.geometry(f"{width}x{height}+{x}+{y}")
+    window.wm_geometry(f"{width}x{height}+{x}+{y}")
 
 
 # Configuration for the app
@@ -204,38 +209,38 @@ WINDOW_WIDTH: Final[int] = 400
 WINDOW_HEIGHT: Final[int] = 110
 
 center_window(root, WINDOW_WIDTH, WINDOW_HEIGHT)
-root.resizable(width=False, height=False)
-root.title("Timer Resolution")
+root.wm_resizable(width=False, height=False)
+root.wm_title("Timer Resolution")
 
 lbl: tk.Label = tk.Label(text=f"Current Resolution: {format_ms(current)}")
-lbl.pack()
+lbl.pack_configure()
 
 lbl2: tk.Label = tk.Label(text=f"Maximum Resolution: {format_ms(minres)}")
-lbl2.pack()
+lbl2.pack_configure()
 
 lbl3: tk.Label = tk.Label(text=f"Maximum Resolution: {format_ms(maxres)}")
-lbl3.pack()
+lbl3.pack_configure()
 
 btn_frame: tk.Frame = tk.Frame(root)
-btn_frame.pack(pady=10)
+btn_frame.pack_configure(pady=10)
 
 btn: ttk.Button = ttk.Button(btn_frame, text="Maximum", command=max_timer)
 root.bind("<m>", max_timer)
-btn.pack(side="left", padx=10)
+btn.pack_configure(side="left", padx=10)
 
 btn2: ttk.Button = ttk.Button(btn_frame, text="Default", command=default_timer)
 root.bind("<d>", default_timer)
-btn2.pack(side="left", padx=10)
+btn2.pack_configure(side="left", padx=10)
 
 btn3: ttk.Button = ttk.Button(btn_frame, text="Custom", command=custom_res_window)
 root.bind("<c>", custom_res_window)
-btn3.pack(side="left", padx=10)
+btn3.pack_configure(side="left", padx=10)
 
 btn4: ttk.Button = ttk.Button(btn_frame, text="Exit", command=exit_out)
-btn4.pack(side="left", padx=10)
+btn4.pack_configure(side="left", padx=10)
 
 # Trigger 'on_exit()' when window is closed
-root.protocol("WM_DELETE_WINDOW", on_exit)
+root.wm_protocol("WM_DELETE_WINDOW", on_exit)
 
 # Use a keybind for exiting the app
 root.bind("<Escape>", exit_out)

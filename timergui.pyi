@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Final, Literal, Union
 
-__version__: Literal["1.1.0"]
+__version__: Literal["1.1.1"]
 __author__: Literal["havinaccount"]
 
 root: tk.Tk
