@@ -1,5 +1,8 @@
 # Compiled Bytecodes
 __pycache__/
 
+# Log files
+runtime.log
+
 # Other stuff
 compiler.py

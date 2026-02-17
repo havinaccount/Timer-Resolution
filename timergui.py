@@ -28,11 +28,12 @@ logging.basicConfig(
 )
 
 # Compile all .py files to .pyc bytecode for future faster execution
-compile_dir(dir=".", optimize=2, quiet=1)
+compile_dir(dir=os.path.dirname(os.path.abspath(__file__)), optimize=2, quiet=1)
+
 # ` This is basically covering linux even though NtSystemTimer is a Windows API
 # // os.system('clear' if os.name == 'posix' else 'cls')
 
-if os.name is "posix":
+if os.name == "posix":
     print("This app is only functional for Windows.")
     sys.exit(1) 
 
@@ -117,7 +118,7 @@ def custom_res_window(event: object = None) -> None:
 
     # Create the warning window
     warning: tk.Toplevel = tk.Toplevel(root)
-    warning.title("Warning")
+    warning.wm_title("Warning")
     center_window(warning, 375, 125)
     warning.wm_resizable(width=False, height=False)
     warning.focus_force()
@@ -199,6 +200,9 @@ def center_window(  # type: ignore
     """
     screen_width: int = window.winfo_screenwidth()
     screen_height: int = window.winfo_screenheight()
+    # // Formula for calculating window location
+    # // (screen_width // 2) - (width // 2) for window width
+    # // (screen_height // 2) - (height // 2) for window height
     x: int = (screen_width // 2) - (width // 2)
     y: int = (screen_height // 2) - (height // 2)
     window.wm_geometry(f"{width}x{height}+{x}+{y}")
