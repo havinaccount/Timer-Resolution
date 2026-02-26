@@ -35,7 +35,7 @@ compile_dir(dir=os.path.dirname(os.path.abspath(__file__)), optimize=2, quiet=1)
 
 if os.name == "posix":
     print("This app is only functional for Windows.")
-    sys.exit(1) 
+    sys.exit(1)
 
 # Initialize a window
 root: tk.Tk = tk.Tk()
