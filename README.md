@@ -23,13 +23,18 @@ pip install -r requirements.txt
 - Run the app:
 
 ~~~: cmd
-python3 timerresolution.py
+python3 timergui.py
 ~~~
 
 ## File Structure
 
 ~~~: nolang
---> timerresolution.py
+--> timergui.py
+--> timergui.pyi
+--> .gitignore
+--> .github
+  --> workflows
+    --> python-app.yml
 --> README.md
 --> requirements.txt
 ~~~
