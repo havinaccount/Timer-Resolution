@@ -9,7 +9,7 @@ using Tkinter
 
 import os
 import logging
-import sys  # Usage at line 154
+import sys  # Usage at line 160
 import tkinter as tk
 from compileall import compile_dir
 from tkinter import ttk  # For native widgets
